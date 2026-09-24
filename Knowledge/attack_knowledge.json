@@ -1,0 +1,31 @@
+{
+    "BENIGN": {
+        "description": "Normal network activity that has not been classified as malicious.",
+        "severity": "LOW",
+        "recommended_action": "Continue monitoring."
+    },
+
+    "ATTACK": {
+        "description": "Network activity classified as suspicious by the intrusion detection model.",
+        "severity": "HIGH",
+        "recommended_action": "Investigate the flow and review related network activity."
+    },
+
+    "DDoS": {
+        "description": "Distributed Denial of Service activity attempts to overwhelm a service or network resource.",
+        "severity": "HIGH",
+        "recommended_action": "Investigate traffic volume, source distribution, and affected services."
+    },
+
+    "Port Scan": {
+        "description": "A port scanning activity attempts to discover accessible network services.",
+        "severity": "MEDIUM",
+        "recommended_action": "Review destination ports, source host activity, and connection patterns."
+    },
+
+    "Brute Force": {
+        "description": "Repeated authentication attempts may indicate an attempt to guess credentials.",
+        "severity": "HIGH",
+        "recommended_action": "Review authentication logs and source addresses."
+    }
+}
