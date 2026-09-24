@@ -52,17 +52,24 @@ def predict_network_flow(flow: NetworkFlow):
         attack_type = "ATTACK"
         risk = "HIGH"
 
+        top_feature_names = [
+             item["feature"]
+            for item in result["top_features"][:3]
+            ]
+        explanation = (
+            f"The Random Forest model classified this network flow as "
+            f"{attack_type} with {result['confidence'] * 100:.2f}% confidence. "
+            f"Risk level: {risk}. "
+            f"Key model features: {', '.join(top_feature_names)}."
+            )
+
     incident = Incident(
         prediction=result["prediction"],
         confidence=result["confidence"],
         attack_type=attack_type,
         risk=risk,
         evidence="Random Forest model prediction",
-        explanation=(
-    f"The Random Forest model classified this network flow as "
-    f"{attack_type} with {result['confidence'] * 100:.2f}% confidence. "
-    f"Risk level: {risk}."
-)
+        explanation=explanation
     )
 
     db.add(incident)
