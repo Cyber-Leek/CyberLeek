@@ -119,3 +119,33 @@ def get_incidents():
     db.close()
 
     return result
+
+@app.post("/feedback")
+def add_feedback(
+    incident_id: int,
+    feedback: str
+):
+    db = SessionLocal()
+
+    incident = db.query(Incident).filter(
+        Incident.id == incident_id
+    ).first()
+
+    if incident is None:
+        db.close()
+
+        return {
+            "message": "Incident not found"
+        }
+
+    incident.feedback = feedback
+
+    db.commit()
+    db.refresh(incident)
+    db.close()
+
+    return {
+        "message": "Feedback saved successfully",
+        "incident_id": incident.id,
+        "feedback": incident.feedback
+    }
