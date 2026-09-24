@@ -288,3 +288,29 @@ def dashboard_feedback_summary():
         "uncertain": uncertain,
         "no_feedback": no_feedback
     }
+
+@app.get("/incidents/{incident_id}")
+def get_incident(incident_id: int):
+    db = SessionLocal()
+
+    incident = db.query(Incident).filter(
+        Incident.id == incident_id
+    ).first()
+
+    db.close()
+
+    if incident is None:
+        return {
+            "message": "Incident not found"
+        }
+
+    return {
+        "id": incident.id,
+        "prediction": incident.prediction,
+        "confidence": incident.confidence,
+        "attack_type": incident.attack_type,
+        "risk": incident.risk,
+        "evidence": incident.evidence,
+        "explanation": incident.explanation,
+        "feedback": incident.feedback
+    }
