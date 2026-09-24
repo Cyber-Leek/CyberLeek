@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 
 from Backend.Schemas import NetworkFlow, FeedbackRequest
-from Backend.Services.ml_service import predict, get_feature_importance
+from Backend.Services.ml_service import (
+    predict,
+    get_feature_importance,
+    get_top_features
+)
 from Backend.Database import SessionLocal, Incident
 
 
@@ -32,7 +36,12 @@ def feature_importance():
 
 @app.post("/predict")
 def predict_network_flow(flow: NetworkFlow):
-    result = predict(flow.model_dump())
+    flow_data = flow.model_dump()
+
+    result = predict(flow_data)
+
+    top_features = get_top_features(flow_data)
+    result["top_features"] = top_features
 
     db = SessionLocal()
 

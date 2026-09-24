@@ -135,3 +135,34 @@ def get_feature_importance():
     )
 
     return feature_importance
+
+def get_top_features(features: dict, top_n: int = 5):
+    """
+    Return the most important model features for this network flow.
+
+    This uses the model's global feature importance together with
+    the values present in the current flow.
+    """
+
+    data = pd.DataFrame([features])
+    data = data[FEATURE_COLUMNS]
+
+    importances = model.feature_importances_
+
+    feature_details = []
+
+    for feature, importance in zip(FEATURE_COLUMNS, importances):
+        value = float(data.iloc[0][feature])
+
+        feature_details.append({
+            "feature": feature,
+            "value": value,
+            "importance": float(importance)
+        })
+
+    feature_details.sort(
+        key=lambda item: item["importance"],
+        reverse=True
+    )
+
+    return feature_details[:top_n]
