@@ -259,3 +259,32 @@ def dashboard_distribution():
         "high_risk": high_risk_count,
         "low_risk": low_risk_count
     }
+
+@app.get("/dashboard/feedback-summary")
+def dashboard_feedback_summary():
+    db = SessionLocal()
+
+    true_positive = db.query(Incident).filter(
+        Incident.feedback == "TRUE_POSITIVE"
+    ).count()
+
+    false_positive = db.query(Incident).filter(
+        Incident.feedback == "FALSE_POSITIVE"
+    ).count()
+
+    uncertain = db.query(Incident).filter(
+        Incident.feedback == "UNCERTAIN"
+    ).count()
+
+    no_feedback = db.query(Incident).filter(
+        Incident.feedback.is_(None)
+    ).count()
+
+    db.close()
+
+    return {
+        "true_positive": true_positive,
+        "false_positive": false_positive,
+        "uncertain": uncertain,
+        "no_feedback": no_feedback
+    }
