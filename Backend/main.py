@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from sqlalchemy import func
 
 from Backend.Schemas import NetworkFlow, FeedbackRequest
 from Backend.Services.ml_service import (
@@ -169,4 +170,92 @@ def add_feedback(request: FeedbackRequest):
         "message": "Feedback saved successfully",
         "incident_id": incident.id,
         "feedback": incident.feedback
+    }
+
+@app.get("/dashboard/stats")
+def dashboard_stats():
+    db = SessionLocal()
+
+    total_incidents = db.query(Incident).count()
+
+    total_attacks = db.query(Incident).filter(
+        Incident.prediction == "1"
+    ).count()
+
+    total_benign = db.query(Incident).filter(
+        Incident.prediction == "0"
+    ).count()
+
+    high_risk = db.query(Incident).filter(
+        Incident.risk == "HIGH"
+    ).count()
+
+    average_confidence = db.query(
+        func.avg(Incident.confidence)
+    ).scalar()
+
+    db.close()
+
+    return {
+        "total_incidents": total_incidents,
+        "total_attacks": total_attacks,
+        "total_benign": total_benign,
+        "high_risk": high_risk,
+        "average_confidence": round(
+            float(average_confidence or 0), 4
+        )
+    }
+
+@app.get("/dashboard/recent-incidents")
+def dashboard_recent_incidents():
+    db = SessionLocal()
+
+    incidents = (
+        db.query(Incident)
+        .order_by(Incident.id.desc())
+        .limit(20)
+        .all()
+    )
+
+    db.close()
+
+    return [
+        {
+            "id": incident.id,
+            "prediction": incident.prediction,
+            "confidence": incident.confidence,
+            "attack_type": incident.attack_type,
+            "risk": incident.risk,
+            "explanation": incident.explanation
+        }
+        for incident in reversed(incidents)
+    ]
+
+@app.get("/dashboard/distribution")
+def dashboard_distribution():
+    db = SessionLocal()
+
+    attack_count = db.query(Incident).filter(
+        Incident.attack_type == "ATTACK"
+    ).count()
+
+    benign_count = db.query(Incident).filter(
+        Incident.attack_type == "BENIGN"
+    ).count()
+
+    high_risk_count = db.query(Incident).filter(
+        Incident.risk == "HIGH"
+    ).count()
+
+    low_risk_count = db.query(Incident).filter(
+        Incident.risk == "LOW"
+    ).count()
+
+    db.close()
+
+    return {
+        "attacks": attack_count,
+        "benign": benign_count,
+        "high_risk": high_risk_count,
+        "low_risk": low_risk_count
     }
