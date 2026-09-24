@@ -1,0 +1,53 @@
+from pydantic import BaseModel
+
+
+class NetworkFlow(BaseModel):
+    L4_SRC_PORT: float
+    L4_DST_PORT: float
+    PROTOCOL: float
+    L7_PROTO: float
+    IN_BYTES: float
+    IN_PKTS: float
+    OUT_BYTES: float
+    OUT_PKTS: float
+    TCP_FLAGS: float
+    CLIENT_TCP_FLAGS: float
+    SERVER_TCP_FLAGS: float
+    FLOW_DURATION_MILLISECONDS: float
+    DURATION_IN: float
+    DURATION_OUT: float
+    MIN_TTL: float
+    MAX_TTL: float
+    LONGEST_FLOW_PKT: float
+    SHORTEST_FLOW_PKT: float
+    MIN_IP_PKT_LEN: float
+    MAX_IP_PKT_LEN: float
+    SRC_TO_DST_SECOND_BYTES: float
+    DST_TO_SRC_SECOND_BYTES: float
+    RETRANSMITTED_IN_BYTES: float
+    RETRANSMITTED_IN_PKTS: float
+    RETRANSMITTED_OUT_BYTES: float
+    RETRANSMITTED_OUT_PKTS: float
+    SRC_TO_DST_AVG_THROUGHPUT: float
+    DST_TO_SRC_AVG_THROUGHPUT: float
+    NUM_PKTS_UP_TO_128_BYTES: float
+    NUM_PKTS_128_TO_256_BYTES: float
+    NUM_PKTS_256_TO_512_BYTES: float
+    NUM_PKTS_512_TO_1024_BYTES: float
+    NUM_PKTS_1024_TO_1514_BYTES: float
+    TCP_WIN_MAX_IN: float
+    TCP_WIN_MAX_OUT: float
+    ICMP_TYPE: float
+    ICMP_IPV4_TYPE: float
+    DNS_QUERY_ID: float
+    DNS_QUERY_TYPE: float
+    DNS_TTL_ANSWER: float
+    FTP_COMMAND_RET_CODE: float
+    SRC_TO_DST_IAT_MIN: float
+    SRC_TO_DST_IAT_MAX: float
+    SRC_TO_DST_IAT_AVG: float
+    SRC_TO_DST_IAT_STDDEV: float
+    DST_TO_SRC_IAT_MIN: float
+    DST_TO_SRC_IAT_MAX: float
+    DST_TO_SRC_IAT_AVG: float
+    DST_TO_SRC_IAT_STDDEV: float

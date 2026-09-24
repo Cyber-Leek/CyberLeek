@@ -1,23 +1,20 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+
+from backend.Schemas import NetworkFlow
+from backend.Services.ml_service import predict
+
 
 app = FastAPI(
-    title="Adaptive AI Network Security Analyst",
+    title="Explainable Network IDS",
+    description="Backend API for the AI-powered Network Intrusion Detection System",
     version="1.0.0"
 )
 
 
-class NetworkFlow(BaseModel):
-    duration: float
-    packets: int
-    bytes: int
-    protocol: str
-
-
 @app.get("/")
-def home():
+def root():
     return {
-        "message": "AI Network Security Backend is running"
+        "message": "Explainable Network IDS API is running"
     }
 
 
@@ -29,9 +26,7 @@ def health():
 
 
 @app.post("/predict")
-def predict(flow: NetworkFlow):
+def predict_network_flow(flow: NetworkFlow):
+    result = predict(flow.model_dump())
 
-    return {
-        "message": "Flow received",
-        "flow": flow.model_dump()
-    }
+    return result
