@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import requests
+from streamlit_autorefresh import st_autorefresh
 
 API_URL = "http://127.0.0.1:8000"
 
@@ -20,6 +21,11 @@ st.set_page_config(
     page_title="Adaptive AI Network Security Analyst",
     page_icon="🛡️",
     layout="wide"
+)
+
+st_autorefresh(
+    interval=10000,
+    key="dashboard_refresh"
 )
 
 # Title
