@@ -113,3 +113,25 @@ def predict(features: dict):
         "label": label,
         "confidence": confidence
     }
+
+def get_feature_importance():
+    """
+    Return the most important features used by the Random Forest model.
+    """
+
+    importances = model.feature_importances_
+
+    feature_importance = []
+
+    for feature, importance in zip(FEATURE_COLUMNS, importances):
+        feature_importance.append({
+            "feature": feature,
+            "importance": float(importance)
+        })
+
+    feature_importance.sort(
+        key=lambda item: item["importance"],
+        reverse=True
+    )
+
+    return feature_importance

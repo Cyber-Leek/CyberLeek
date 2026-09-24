@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from Backend.Schemas import NetworkFlow, FeedbackRequest
-from Backend.Services.ml_service import predict
+from Backend.Services.ml_service import predict, get_feature_importance
 from Backend.Database import SessionLocal, Incident
 
 
@@ -24,6 +24,10 @@ def health():
     return {
         "status": "healthy"
     }
+
+@app.get("/feature-importance")
+def feature_importance():
+    return get_feature_importance()
 
 
 @app.post("/predict")
