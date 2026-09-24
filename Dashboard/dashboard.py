@@ -124,7 +124,7 @@ if uploaded_file is not None:
     else:
 
         high_risk_count = 0
-        
+
 else:
 
     df = None
@@ -321,193 +321,190 @@ else:
 
 st.divider()
 
+# AI Investigation
+st.subheader("🔍 AI Investigation")
 
-# ============================================================
-# AI INVESTIGATION
-# ============================================================
-
-st.subheader(
-    "🔍 AI Investigation"
-)
-
-
-incidents = get_backend_data(
-    "/dashboard/recent-incidents"
-)
-
+incidents = get_backend_data("/dashboard/recent-incidents")
 
 if incidents is not None and len(incidents) > 0:
 
     incident_options = {
-
         f"Incident #{incident['id']} - "
         f"{incident['attack_type']} - "
-        f"{incident['risk']}":
-
-        incident["id"]
-
+        f"{incident['risk']}": incident["id"]
         for incident in incidents
     }
-
 
     selected_incident = st.selectbox(
         "Select an incident to investigate",
         list(incident_options.keys())
     )
 
+    selected_id = incident_options[selected_incident]
 
-    selected_id = incident_options[
-        selected_incident
-    ]
-
-
-    if st.button(
-        "🔍 Investigate Selected Alert"
-    ):
+    if st.button("🔍 Investigate Selected Alert"):
 
         incident = get_backend_data(
             f"/incidents/{selected_id}"
         )
 
-
         if incident is not None:
 
             if incident["prediction"] == "1":
-
-                st.warning(
-                    "⚠️ ATTACK DETECTED"
-                )
-
+                st.warning("⚠️ ATTACK DETECTED")
             else:
+                st.success("✅ BENIGN FLOW")
 
-                st.success(
-                    "✅ BENIGN FLOW"
-                )
-
-
-            st.write(
-                "### ML Confidence"
-            )
+            st.write("### ML Confidence")
 
             st.write(
                 f"{incident['confidence'] * 100:.2f}%"
             )
 
-
-            st.write(
-                "### Observed Evidence"
-            )
+            st.write("### Observed Evidence")
 
             st.write(
                 incident["evidence"]
             )
 
-
-            st.write(
-                "### AI Interpretation"
-            )
+            st.write("### AI Interpretation")
 
             st.write(
                 incident["explanation"]
             )
 
-
-            st.write(
-                "### Risk"
-            )
-
+            st.write("### Risk")
 
             if incident["risk"] == "HIGH":
-
-                st.error(
-                    "HIGH"
-                )
-
+                st.error("HIGH")
             else:
+                st.success(incident["risk"])
 
-                st.success(
-                    incident["risk"]
-                )
-
-
-            st.write(
-                "### Incident ID"
-            )
+            st.write("### Incident ID")
 
             st.write(
                 f"#{incident['id']}"
             )
 
-
         else:
-
-            st.error(
-                "Unable to retrieve incident details."
-            )
-
+            st.error("Unable to retrieve incident details.")
 
 else:
-
-    st.info(
-        "No incidents available for investigation."
-    )
+    st.info("No incidents available for investigation.")
 
 
 # ============================================================
-# ANALYST FEEDBACK SUMMARY
+# ANALYST DECISION
 # ============================================================
 
 st.divider()
 
-st.subheader(
-    "📊 Analyst Feedback Summary"
+st.subheader("🧑‍💻 Analyst Decision")
+
+st.write(
+    "After investigating an alert, the analyst can confirm whether "
+    "the detection was correct."
 )
 
+if incidents is not None and len(incidents) > 0:
+
+    decision_options = {
+        f"Incident #{incident['id']} - "
+        f"{incident['attack_type']} - "
+        f"{incident['risk']}": incident["id"]
+        for incident in incidents
+    }
+
+    decision_selection = st.selectbox(
+        "Select incident for final decision",
+        list(decision_options.keys()),
+        key="decision_incident"
+    )
+
+    decision_incident_id = decision_options[decision_selection]
+
+    analyst_decision = st.radio(
+        "Analyst decision",
+        [
+            "TRUE_POSITIVE",
+            "FALSE_POSITIVE",
+            "UNCERTAIN"
+        ],
+        horizontal=True
+    )
+
+    if st.button("💾 Submit Decision"):
+
+        try:
+
+            response = requests.post(
+                f"{API_URL}/feedback",
+                json={
+                    "incident_id": decision_incident_id,
+                    "feedback": analyst_decision
+                },
+                timeout=5
+            )
+
+            response.raise_for_status()
+
+            st.success(
+                f"Decision '{analyst_decision}' saved "
+                f"for Incident #{decision_incident_id}."
+            )
+
+            st.info(
+                "The analyst decision has been automatically "
+                "stored in the database."
+            )
+
+            st.rerun()
+
+        except requests.RequestException as e:
+
+            st.error(
+                f"Unable to save analyst decision: {e}"
+            )
+
+
+# ============================================================
+# FEEDBACK SUMMARY
+# ============================================================
+
+st.divider()
+
+st.subheader("📊 Analyst Feedback Summary")
 
 feedback_summary = get_backend_data(
     "/dashboard/feedback-summary"
 )
 
-
 if feedback_summary is not None:
 
     col1, col2, col3, col4 = st.columns(4)
-
 
     col1.metric(
         "✅ True Positives",
         feedback_summary["true_positive"]
     )
 
-
     col2.metric(
         "❌ False Positives",
         feedback_summary["false_positive"]
     )
-
 
     col3.metric(
         "❓ Uncertain",
         feedback_summary["uncertain"]
     )
 
-
     col4.metric(
         "⏳ No Feedback",
         feedback_summary["no_feedback"]
     )
 
-
 else:
-
-    st.warning(
-        "Unable to load feedback summary."
-    )
-
-
-st.divider()
-
-
+    st.warning("Unable to load feedback summary.")
 # ============================================================
 # THREAT DISTRIBUTION
 # ============================================================
