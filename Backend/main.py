@@ -45,7 +45,11 @@ def predict_network_flow(flow: NetworkFlow):
         attack_type=attack_type,
         risk=risk,
         evidence="Random Forest model prediction",
-        explanation=f"Model confidence is {result['confidence'] * 100:.2f} percent"
+        explanation=(
+    f"The Random Forest model classified this network flow as "
+    f"{attack_type} with {result['confidence'] * 100:.2f}% confidence. "
+    f"Risk level: {risk}."
+)
     )
 
     db.add(incident)
