@@ -8,7 +8,7 @@ import pandas as pd
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 # Model location
-MODEL_PATH = PROJECT_ROOT / "ml" / "random_forest_nids.joblib"
+MODEL_PATH = PROJECT_ROOT / "ML" / "random_forest_nids.joblib"
 
 
 # Load the trained Random Forest model
