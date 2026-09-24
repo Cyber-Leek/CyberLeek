@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from Backend.Schemas import NetworkFlow
+from Backend.Schemas import NetworkFlow, FeedbackRequest
 from Backend.Services.ml_service import predict
 from Backend.Database import SessionLocal, Incident
 
@@ -121,14 +121,11 @@ def get_incidents():
     return result
 
 @app.post("/feedback")
-def add_feedback(
-    incident_id: int,
-    feedback: str
-):
+def add_feedback(request: FeedbackRequest):
     db = SessionLocal()
 
     incident = db.query(Incident).filter(
-        Incident.id == incident_id
+        Incident.id == request.incident_id
     ).first()
 
     if incident is None:
@@ -138,7 +135,7 @@ def add_feedback(
             "message": "Incident not found"
         }
 
-    incident.feedback = feedback
+    incident.feedback = request.feedback
 
     db.commit()
     db.refresh(incident)

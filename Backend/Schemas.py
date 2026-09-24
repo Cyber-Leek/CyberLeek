@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Literal
 
 
 class NetworkFlow(BaseModel):
@@ -51,3 +52,12 @@ class NetworkFlow(BaseModel):
     DST_TO_SRC_IAT_MAX: float
     DST_TO_SRC_IAT_AVG: float
     DST_TO_SRC_IAT_STDDEV: float
+
+
+class FeedbackRequest(BaseModel):
+    incident_id: int
+    feedback: Literal[
+        "TRUE_POSITIVE",
+        "FALSE_POSITIVE",
+        "UNCERTAIN"
+    ]
