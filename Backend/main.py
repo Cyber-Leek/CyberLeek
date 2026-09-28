@@ -7,6 +7,8 @@ from Backend.Services.ml_service import (
     get_feature_importance,
     get_top_features
 )
+
+from Backend.Services.ai_service import investigate_alert
 from Backend.Database import SessionLocal, Incident
 
 
@@ -43,9 +45,6 @@ def predict_network_flow(flow: NetworkFlow):
 
     top_features = get_top_features(flow_data)
     result["top_features"] = top_features
-
-    db = SessionLocal()
-
     if result["prediction"] == 0:
         attack_type = "BENIGN"
         risk = "LOW"
@@ -53,17 +52,18 @@ def predict_network_flow(flow: NetworkFlow):
         attack_type = "ATTACK"
         risk = "HIGH"
 
-        top_feature_names = [
-             item["feature"]
-            for item in result["top_features"][:3]
-            ]
-        explanation = (
-            f"The Random Forest model classified this network flow as "
-            f"{attack_type} with {result['confidence'] * 100:.2f}% confidence. "
-            f"Risk level: {risk}. "
-            f"Key model features: {', '.join(top_feature_names)}."
-            )
+    ai_result = investigate_alert(
+        prediction=attack_type,
+        confidence=result["confidence"],
+        top_features=top_features,
+        risk=risk
+    )
 
+    result["ai_investigation"] = ai_result
+
+    db = SessionLocal()
+
+    explanation = ai_result["explanation"]
     incident = Incident(
         prediction=result["prediction"],
         confidence=result["confidence"],
